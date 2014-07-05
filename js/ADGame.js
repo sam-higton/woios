@@ -259,7 +259,7 @@ function KeyListener(){
     return kb;
 }
 
-function ADGame () {
+function ADGame (targetElementID) {
 
 	this.canvas = false;
 	this.loopSubscriptions = [];
@@ -302,7 +302,8 @@ function ADGame () {
 
 	this.init =  function () {
 		//console.log(this.pos.y);
-		this.canvas = Raphael(this.pos.x,this.pos.y,this.viewPortSize.x,this.viewPortSize.y);
+		var gameElement = document.getElementById(targetElementID);
+		this.canvas = Raphael(gameElement,this.viewPortSize.x,this.viewPortSize.y);
 		//this.canvas.attr('fill',this.backgroundColor);
 		for(var i in self.initActions) {
 			self.initActions[i](self);

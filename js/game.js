@@ -3,7 +3,7 @@
 
 
 window.onload = function () {
-	var game = new ADGame();
+	var game = new ADGame('game-target');
 
 	game.register['gameOver'] = false;
 
@@ -366,10 +366,6 @@ window.onload = function () {
 	});
 
 	game.startLoop();
-
-	document.getElementById('startButton').addEventListener("click",function () {
-		game.startLoop();
-	});
 
 		
 };

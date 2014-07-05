@@ -1,0 +1,22 @@
+#game-object {
+	width: 640px;
+	height: 480px;
+}
+
+body {
+  padding-top: 50px;
+}
+.starter-template {
+  padding: 40px 15px;
+  text-align: center;
+}
+
+
+.header {
+	background: #f5f5f5;
+	font-weight: bold;
+}
+
+.control {
+	font-weight: bold;
+}
