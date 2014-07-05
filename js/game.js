@@ -208,27 +208,94 @@ window.onload = function () {
 
 		playerShip.updateActions.push(function (self) {
 
-			if(self.game.keyboard['W'] && self.pos.y > 0) {
+			
+
+			var actions = {
+				"up" : false,
+				"down" : false,
+				"left" : false,
+				"right" : false,
+				"fire" : false,
+				"switchMode" : false
+			}
+
+			if(self.game.keyboard['W']) {
+				actions.up = true;
+			}
+
+			if(self.game.keyboard['S']) {
+				actions.down = true;
+			}
+
+			if(self.game.keyboard['D']) {
+				actions.right = true;
+			}
+
+			if(self.game.keyboard['A']) {
+				actions.left = true;
+			}
+
+			if(self.game.keyboard['K']) {
+				actions.fire = true;
+			}
+
+			if(self.game.keyboard['L']) {
+				actions.switchMode = true;
+			}
+
+			if(typeof navigator.webkitGetGamepads != "undefined") {
+				var gamePad = navigator.webkitGetGamepads()[0];
+				if(typeof gamePad != "undefined") {
+					if(gamePad.axes[0] > 0.3) {
+						actions.right = true;
+					}
+
+					if(gamePad.axes[0] < -0.3) {
+						actions.left = true;
+					}
+
+					if(gamePad.axes[1] < -0.3) {
+						actions.up = true;
+					}
+
+					if(gamePad.axes[1] > 0.3) {
+						actions.down = true;
+					}
+
+					if(gamePad.buttons[0]) {
+						actions.fire = true;
+					}
+
+					if(gamePad.buttons[1]) {
+						actions.switchMode = true;
+					}
+				}
+
+			}
+
+			//var gamePad = navigator.webkitGetGamepads()[0];
+
+			if((actions.up) && self.pos.y > 0) {
 				self.vel.y = -self.maxVel;
-			} else if(self.game.keyboard['S'] && self.pos.y < (self.game.worldSize.y - self.dim.y)) {
+			} else if(actions.down && self.pos.y < (self.game.worldSize.y - self.dim.y)) {
 				self.vel.y = self.maxVel;
 			} else {
 				self.vel.y = 0;
 			}
 
-			if(self.game.keyboard['A'] && self.pos.x > 0) {
+			if(actions.left && self.pos.x > 0) {
 				self.vel.x = -self.maxVel;
-			} else if(self.game.keyboard['D'] && self.pos.x < (self.game.worldSize.x - self.dim.x)) {
+			} else if(actions.right && self.pos.x < (self.game.worldSize.x - self.dim.x)) {
 				self.vel.x = self.maxVel;
 			} else {
 				self.vel.x = 0;
 			}
 
-			if(self.game.keyboard['K']) {
+			if(actions.fire) {
 				self.objectAttachments['gun'].attemptFire();
 			}
 
-			if(self.game.keyboard['L']) {
+			if(actions.switchMode) {
 		
 				if(!self.hasFlipped) {
 					if(self.ammoType == "A") {
