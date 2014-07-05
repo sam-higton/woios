@@ -381,6 +381,7 @@ window.onload = function () {
 				}
 				
 				if(secondaryObject.rad < 7) {
+					self.game.register['asteroidCollection'].removeSecondaryObjectById(secondaryObject.id);
 					secondaryObject.destroy();
 				}
 			}
