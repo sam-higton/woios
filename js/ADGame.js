@@ -272,6 +272,7 @@ function ADGame (targetElementID) {
 	this.activeKeys = [];
 	this.register = [];
 	this.helpers = [];
+	this.sounds = [];
 	this.keyboard = new KeyListener();
 	this.loopTime = 20;//ms
 	this.loopActive = false;
@@ -309,6 +310,17 @@ function ADGame (targetElementID) {
 			self.initActions[i](self);
 		}
 	};
+
+	this.addSound = function (name, filepath) {
+		var newSound = new buzz.sound(filepath);
+		//newSound.setSpeed(2);
+		self.sounds[name] = newSound;
+	}
+
+	this.playSound = function (name) {
+		self.sounds[name].play();
+	}
+
 	this.loop = function () {
 
 		this.currentFrame += 1;

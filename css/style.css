@@ -20,3 +20,8 @@ body {
 .control {
 	font-weight: bold;
 }
+
+.control .or {
+	font-weight: normal;
+	font-style: italic;
+}

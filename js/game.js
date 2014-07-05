@@ -9,6 +9,7 @@ window.onload = function () {
 
 	game.postRenderActions.push(function (game) {
 		if(game.register['gameOver']) {
+			game.playSound('killed');
 			var gameOverMessage = "GAME OVER\n FINAL SCORE: " + game.register['totalScore'];
 			var gameOverText = game.canvas.text(320,240,gameOverMessage);
 			gameOverText.toFront();
@@ -20,6 +21,10 @@ window.onload = function () {
 			game.stopLoop();
 		}
 	});
+
+	game.addSound("shoot","assets/sounds/gun_sound.wav");
+	game.addSound("hit","assets/sounds/hit2.wav");
+	game.addSound('killed',"assets/sounds/player_killed.wav");
 
 	game.initActions.push(function (game) {
 		var as1 = game.objectFactory.get('asteroid',{
@@ -196,6 +201,7 @@ window.onload = function () {
 					type: self.parentObject.ammoType
 				});
 				self.parentObject.game.addGameObject(newBullet);
+				self.parentObject.game.playSound("shoot");
 				self.cooldown = self.maxCooldown;
 			}
 
@@ -372,7 +378,7 @@ window.onload = function () {
 		bulletCollisions.interactions.push(function (self,primaryObject,secondaryObject) {
 			//console.log(primaryObject);
 			if(self.game.helpers['2DMath'].objectIntersect(primaryObject,secondaryObject)) {
-				
+				self.game.playSound('hit');
 				primaryObject.destroy();
 				if(primaryObject.type == secondaryObject.type) {
 					secondaryObject.rad -= 10;
