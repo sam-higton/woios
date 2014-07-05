@@ -60,7 +60,7 @@ window.onload = function () {
 
 		//destroy if asteroid leaves game limits
 		newAsteroid.updateActions.push(function (self) {
-			if((self.pos.y < 0 || self.pos.y > self.game.dimensions.y) || self.pos.x < 0) {
+			if((self.pos.y < 0 || self.pos.y > self.game.worldSize.y) || self.pos.x < 0) {
 				console.log('out of bounds: ' + self.id);
 				//spawn between 1 and 3 new asteroids
 				for(var i = 0; i < self.game.helpers['RandomNumber'].getInt(1,3); i++) {
@@ -120,21 +120,22 @@ window.onload = function () {
 
 	game.objectFactory.addType('playerShip',function (params) {
 		var playerShip = new simpleObject(game);
-
+		playerShip.type = "playerShip";
+		playerShip.shapeType = "rect";
 		playerShip.pos = {
 			x: params.startPosX,
 			y: params.startPosY
-		}
+		};
 
 		playerShip.dim = {
 			x: 15,
 			y: 7
-		}
+		};
 
 		playerShip.vel = {
 			x: 0,
 			y: 0
-		}
+		};
 
 		playerShip.ammoType = "A";
 		playerShip.hasFlipped = false;
@@ -235,7 +236,7 @@ window.onload = function () {
 			//do collision check here
 			//console.log(self);
 			if(self.game.helpers['2DMath'].objectIntersect(primaryObject,secondaryObject)) {
-				
+
 				var gameOverMessage = "GAME OVER\n FINAL SCORE: " + self.game.register['totalScore'];
 				var gameOverText = self.game.canvas.text(320,240,gameOverMessage);
 				self.game.stopLoop();
@@ -250,6 +251,8 @@ window.onload = function () {
 
 	game.objectFactory.addType('bullet', function (params) {
 		var bullet = new simpleObject(game);
+		bullet.type = "bullet";
+		bullet.shapeType = "rect";
 		bullet.pos = {
 			x:params.startPosX,
 			y:params.startPosY

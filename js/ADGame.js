@@ -1,7 +1,7 @@
 function simpleObject (game) {
 
 	this.type = "simpleObject";
-
+	this.shapeType = "circle";
 	this.game = game;
 
 	this.pos = {
@@ -15,12 +15,48 @@ function simpleObject (game) {
 	};
 	this.updateActions = [];
 	this.rad = 5;
+	this.dim = {
+		x: 5,
+		y: 5
+	};
+	this.collisionBoxDim = {
+		x: 5,
+		y: 5
+	};
+
+	this.collisionRad = 5;
+
 	this.objectAttachments = [];
 	this.id = IDKeeper.getId();
 
 	this.renderObject = false;
 
 	var self = this;
+
+	/*this.isInScene = function (renderPos) {
+		if(self.shapeType == "circle") {
+			return (
+				(renderPos.x - self.rad > 0 && renderPos.x + self.rad < self.game.viewPortSize.x) &&
+				(renderPos.y - self.rad > 0 && renderPos.y + self.rad < self.game.viewPortSize.y) 
+			 );
+		} else if (self.shapeType == "rect") {
+			var topLeft = self.pos;
+			var bottomRight = self.game.helpers['2DMath'].addTwoVectors(self.pos,self.dim);
+			return (
+				(
+
+				)
+
+			);
+		} else {
+			console.log('err: unspecified shape type');
+			return false
+		}
+	};*/
+
+	this.getRenderPos = function () {
+		self.game.helpers['2DMath'].subtractTwoVectors(self.pos,self.game.viewPortOffset);
+	}
 
 	this.updatePosition = function () {
 		self.pos.x += self.vel.x;
@@ -36,6 +72,10 @@ function simpleObject (game) {
 		for(var i in self.updateActions) {
 			self.updateActions[i](self);
 		}
+	}
+
+	this.preRender = function (self) {
+
 	}
 
 	this.render = function (self) {
@@ -80,6 +120,13 @@ function TwoDimensionalMath () {
 		var resultantVector = {};
 		resultantVector.x = vectorA.x + vectorB.x;
 		resultantVector.y = vectorA.y + vectorB.y;
+		return resultantVector;
+	};
+
+	this.subtractTwoVectors = function (vectorA, vectorB) {
+		var resultantVector = {};
+		resultantVector.x = vectorA.x - vectorB.x;
+		resultantVector.y = vectorA.y - vectorB.y;
 		return resultantVector;
 	};
 
@@ -227,20 +274,33 @@ function ADGame () {
 	this.loopTime = 20;//ms
 	this.loopActive = false;
 	this.currentFrame = 0;
+	this.backgroundColor = "#333";
 	this.pos = {
 		x: 10,
 		y: 40
 	};
-	this.dimensions = {
+
+	this.viewPortSize = {
 		x: 640,
 		y: 480
 	};
+
+	this.worldSize = {
+		x: 640,
+		y: 480
+	};
+
+	this.viewPortOffset = {
+		x: 0,
+		y: 0
+	}
 
 	var self = this;
 
 	this.init =  function () {
 		//console.log(this.pos.y);
-		this.canvas = Raphael(this.pos.x,this.pos.y,this.dimensions.x,this.dimensions.y);
+		this.canvas = Raphael(this.pos.x,this.pos.y,this.viewPortSize.x,this.viewPortSize.y);
+		//this.canvas.attr('fill',this.backgroundColor);
 		for(var i in self.initActions) {
 			self.initActions[i](self);
 		}
@@ -251,6 +311,8 @@ function ADGame () {
 
 		//clear screen
 		self.canvas.clear();
+		var background = self.canvas.rect(0,0,this.viewPortSize.x, this.viewPortSize.y);
+		background.attr('fill',self.backgroundColor);
 
 		//run through all game objects
 		for(var i in self.gameObjects) {
