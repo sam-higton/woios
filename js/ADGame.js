@@ -265,6 +265,8 @@ function ADGame () {
 	this.loopSubscriptions = [];
 	this.renderSubscriptions = [];
 	this.initActions = [];
+	this.postRenderActions = [];
+	this.preRenderActions = [];
 	this.gameObjects = [];
 	this.objectFactory = new gameObjectFactory(this);
 	this.activeKeys = [];
@@ -275,6 +277,7 @@ function ADGame () {
 	this.loopActive = false;
 	this.currentFrame = 0;
 	this.backgroundColor = "#333";
+	this.gameOver = false;
 	this.pos = {
 		x: 10,
 		y: 40
@@ -314,6 +317,11 @@ function ADGame () {
 		var background = self.canvas.rect(0,0,this.viewPortSize.x, this.viewPortSize.y);
 		background.attr('fill',self.backgroundColor);
 
+		//run through all pre-render actions
+		for(var i in self.preRenderActions) {
+			self.preRenderActions[i](self);
+		};
+
 		//run through all game objects
 		for(var i in self.gameObjects) {
 			if(self.gameObjects[i] != undefined) {
@@ -325,6 +333,11 @@ function ADGame () {
 		//loop through all loop subscriptions
 		for(var i in self.loopSubscriptions) {
 			self.loopSubscriptions[i](self);
+		}
+
+		//run through all post render actions
+		for(var i in self.postRenderActions) {
+			self.postRenderActions[i](self);
 		}
 
 		//if active, initiate next loop sequence

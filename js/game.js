@@ -4,6 +4,23 @@
 
 window.onload = function () {
 	var game = new ADGame();
+
+	game.register['gameOver'] = false;
+
+	game.postRenderActions.push(function (game) {
+		if(game.register['gameOver']) {
+			var gameOverMessage = "GAME OVER\n FINAL SCORE: " + game.register['totalScore'];
+			var gameOverText = game.canvas.text(320,240,gameOverMessage);
+			gameOverText.toFront();
+			gameOverText.attr('font-size', '42px');
+			gameOverText.attr('font-weight','bold');
+			gameOverText.attr('fill', '#fff');
+			gameOverText.attr('stroke','#000');
+			gameOverText.attr('stroke-width','2px');
+			game.stopLoop();
+		}
+	});
+
 	game.initActions.push(function (game) {
 		var as1 = game.objectFactory.get('asteroid',{
 			startPosX: 640,
@@ -63,7 +80,7 @@ window.onload = function () {
 			if((self.pos.y < 0 || self.pos.y > self.game.worldSize.y) || self.pos.x < 0) {
 				console.log('out of bounds: ' + self.id);
 				//spawn between 1 and 3 new asteroids
-				for(var i = 0; i < self.game.helpers['RandomNumber'].getInt(1,3); i++) {
+				for(var i = 0; i < self.game.helpers['RandomNumber'].getInt(1,2); i++) {
 					if(self.game.register['asteroidCount'] > self.game.register['maxAsteroids']) 	{
 						break;
 					}
@@ -190,17 +207,18 @@ window.onload = function () {
 		}(playerShip);
 
 		playerShip.updateActions.push(function (self) {
-			if(self.game.keyboard['W']) {
+
+			if(self.game.keyboard['W'] && self.pos.y > 0) {
 				self.vel.y = -self.maxVel;
-			} else if(self.game.keyboard['S']) {
+			} else if(self.game.keyboard['S'] && self.pos.y < (self.game.worldSize.y - self.dim.y)) {
 				self.vel.y = self.maxVel;
 			} else {
 				self.vel.y = 0;
 			}
 
-			if(self.game.keyboard['A']) {
+			if(self.game.keyboard['A'] && self.pos.x > 0) {
 				self.vel.x = -self.maxVel;
-			} else if(self.game.keyboard['D']) {
+			} else if(self.game.keyboard['D'] && self.pos.x < (self.game.worldSize.x - self.dim.x)) {
 				self.vel.x = self.maxVel;
 			} else {
 				self.vel.x = 0;
@@ -236,10 +254,9 @@ window.onload = function () {
 			//do collision check here
 			//console.log(self);
 			if(self.game.helpers['2DMath'].objectIntersect(primaryObject,secondaryObject)) {
-
-				var gameOverMessage = "GAME OVER\n FINAL SCORE: " + self.game.register['totalScore'];
-				var gameOverText = self.game.canvas.text(320,240,gameOverMessage);
-				self.game.stopLoop();
+				//end game
+				self.game.register['gameOver'] = true;
+				
 			}
 		});
 
