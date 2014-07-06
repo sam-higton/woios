@@ -22,7 +22,7 @@ window.onload = function () {
 		}
 	});
 
-	game.addSound("shoot","assets/sounds/gun_sound.wav");
+	game.addSound("shoot","assets/sounds/shoot2.wav");
 	game.addSound("hit","assets/sounds/hit2.wav");
 	game.addSound('killed',"assets/sounds/player_killed.wav");
 
