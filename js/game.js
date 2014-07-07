@@ -5,22 +5,9 @@
 window.onload = function () {
 	var game = new ADGame('game-target');
 
-	game.register['gameOver'] = false;
+	
 
-	game.postRenderActions.push(function (game) {
-		if(game.register['gameOver']) {
-			game.playSound('killed');
-			var gameOverMessage = "GAME OVER\n FINAL SCORE: " + game.register['totalScore'];
-			var gameOverText = game.canvas.text(320,240,gameOverMessage);
-			gameOverText.toFront();
-			gameOverText.attr('font-size', '42px');
-			gameOverText.attr('font-weight','bold');
-			gameOverText.attr('fill', '#fff');
-			gameOverText.attr('stroke','#000');
-			gameOverText.attr('stroke-width','2px');
-			game.stopLoop();
-		}
-	});
+	
 
 	game.addSound("shoot","assets/sounds/shoot2.wav");
 	game.addSound("hit","assets/sounds/hit2.wav");
@@ -329,7 +316,8 @@ window.onload = function () {
 			//console.log(self);
 			if(self.game.helpers['2DMath'].objectIntersect(primaryObject,secondaryObject)) {
 				//end game
-				self.game.register['gameOver'] = true;
+				self.game.playSound('killed');
+				self.game.activeState = "gameOver";
 				
 			}
 		});
@@ -407,12 +395,54 @@ window.onload = function () {
 
 	game.init();
 	
+	game.addState('gameOver');
+	game.addStateAction('gameOver', function (self) {
+		var gameOverMessage = "GAME OVER\n FINAL SCORE: " + self.register['totalScore'];
+		gameOverMessage += "\n PRESS 'K' TO TRY AGAIN";
+		var gameOverText = self.canvas.text(320,240,gameOverMessage);
+		gameOverText.toFront();
+		gameOverText.attr('font-size', '42px');
+		gameOverText.attr('font-weight','bold');
+		gameOverText.attr('fill', '#fff');
+		gameOverText.attr('stroke','#000');
+		gameOverText.attr('stroke-width','2px');
+	});
+
+	game.addState('start');
+	game.addStateAction('start', function(self) {
+		self.resetFrame();
+		var gameOverText = self.canvas.text(320,240,"PRESS 'K' TO START");
+		gameOverText.toFront();
+		gameOverText.attr('font-size', '42px');
+		gameOverText.attr('font-weight','bold');
+		gameOverText.attr('fill', '#fff');
+		gameOverText.attr('stroke','#000');
+		gameOverText.attr('stroke-width','2px');
+
+		if(self.keyboard['K']) {
+			self.activeState = "main";
+		}
+
+
+	});
+	game.activeState = "start";
+
 
 	//game.loopSubscriptions.push(playerShipInteractions.check);
 
 	//game.register['playerShipInteractions'] = playerShipInteractions;
 
 	game.addState('paused');
+
+	game.addStateAction('paused', function (self) {
+		var gameOverText = game.canvas.text(320,240,"PAUSED");
+			gameOverText.toFront();
+			gameOverText.attr('font-size', '42px');
+			gameOverText.attr('font-weight','bold');
+			gameOverText.attr('fill', '#fff');
+			gameOverText.attr('stroke','#000');
+			gameOverText.attr('stroke-width','2px');
+	});
 
 	game.loopSubscriptions.push(function (gameObject) {
 		if(gameObject.keyboard['P']) {
@@ -438,9 +468,13 @@ window.onload = function () {
 
 	});
 
-	game.loopSubscriptions.push(function (gameObject) {
+	game.addStateAction("main", function (gameObject) {
 		gameObject.register['totalScore'] += gameObject.currentFrame;
-		var textObject = gameObject.canvas.text(580,20, 'total score: ' + gameObject.register['totalScore']);
+		var textObject = gameObject.canvas.text(500,20, 'total score: ' + gameObject.register['totalScore']);
+		textObject.attr("fill","#fff");
+		textObject.attr('font-size', "18px");
+		textObject.attr('text-align','right');
+
 	});
 
 	game.startLoop();

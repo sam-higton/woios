@@ -318,9 +318,7 @@ function ADGame (targetElementID) {
 		});
 
 		self.addStateAction("main", function (self) {
-			self.canvas.clear();
-			var background = self.canvas.rect(0,0,self.viewPortSize.x, self.viewPortSize.y);
-			background.attr('fill',self.backgroundColor);
+			self.resetFrame();	
 			for(var i in self.gameObjects) {				
 				self.gameObjects[i].render(self.gameObjects[i]);
 			}
@@ -329,6 +327,12 @@ function ADGame (targetElementID) {
 		for(var i in self.initActions) {
 			self.initActions[i](self);
 		}
+	};
+
+	this.resetFrame = function () {
+		self.canvas.clear();
+		var background = self.canvas.rect(0,0,self.viewPortSize.x, self.viewPortSize.y);
+		background.attr('fill',self.backgroundColor);
 	};
 
 	this.addSound = function (name, filepath) {
@@ -363,7 +367,10 @@ function ADGame (targetElementID) {
 
 		//run through current state actions
 		for(var i in self.stateActions[self.activeState]) {
-			self.stateActions[self.activeState][i](self);
+			if(typeof self.stateActions[self.activeState][i] == "function") {
+				self.stateActions[self.activeState][i](self);
+			}
+			
 		}
 
 		//loop through all loop subscriptions
@@ -372,9 +379,7 @@ function ADGame (targetElementID) {
 		}
 
 		//run through all post render actions
-		for(var i in self.postRenderActions) {
-			self.postRenderActions[i](self);
-		}
+		
 
 		//if active, initiate next loop sequence
 		if(this.loopActive) {
