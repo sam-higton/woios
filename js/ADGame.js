@@ -267,6 +267,8 @@ function ADGame (targetElementID) {
 	this.initActions = [];
 	this.postRenderActions = [];
 	this.preRenderActions = [];
+	this.activeState = "";
+	this.stateActions = [];
 	this.gameObjects = [];
 	this.objectFactory = new gameObjectFactory(this);
 	this.activeKeys = [];
@@ -306,6 +308,24 @@ function ADGame (targetElementID) {
 		var gameElement = document.getElementById(targetElementID);
 		this.canvas = Raphael(gameElement,this.viewPortSize.x,this.viewPortSize.y);
 		//this.canvas.attr('fill',this.backgroundColor);
+
+		self.addState("main");
+		self.activeState = "main";
+		self.addStateAction("main",function (self) {
+			for(var i in self.gameObjects) {
+				self.gameObjects[i].update(self.gameObjects[i]);
+			}
+		});
+
+		self.addStateAction("main", function (self) {
+			self.canvas.clear();
+			var background = self.canvas.rect(0,0,self.viewPortSize.x, self.viewPortSize.y);
+			background.attr('fill',self.backgroundColor);
+			for(var i in self.gameObjects) {				
+				self.gameObjects[i].render(self.gameObjects[i]);
+			}
+		});
+
 		for(var i in self.initActions) {
 			self.initActions[i](self);
 		}
@@ -321,26 +341,29 @@ function ADGame (targetElementID) {
 		self.sounds[name].play();
 	}
 
+	this.addState = function (stateTypeName) {
+		this.stateActions[stateTypeName] = [];
+	}
+
+	this.addStateAction = function (state, action) {
+		this.stateActions[state].push(action);
+	}
+
 	this.loop = function () {
 
 		this.currentFrame += 1;
 
 		//clear screen
-		self.canvas.clear();
-		var background = self.canvas.rect(0,0,this.viewPortSize.x, this.viewPortSize.y);
-		background.attr('fill',self.backgroundColor);
+		
 
 		//run through all pre-render actions
 		for(var i in self.preRenderActions) {
 			self.preRenderActions[i](self);
 		};
 
-		//run through all game objects
-		for(var i in self.gameObjects) {
-			if(self.gameObjects[i] != undefined) {
-				self.gameObjects[i].render(self.gameObjects[i]);
-				self.gameObjects[i].update(self.gameObjects[i]);
-			}
+		//run through current state actions
+		for(var i in self.stateActions[self.activeState]) {
+			self.stateActions[self.activeState][i](self);
 		}
 
 		//loop through all loop subscriptions

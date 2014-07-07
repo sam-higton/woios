@@ -411,16 +411,19 @@ window.onload = function () {
 
 	//game.register['playerShipInteractions'] = playerShipInteractions;
 
+	game.addState('paused');
+
 	game.loopSubscriptions.push(function (gameObject) {
 		if(gameObject.keyboard['P']) {
 			if(!gameObject.register['pActive'] || gameObject.register['pActive'] == undefined) {
 				gameObject.register['pActive'] = true;
-				if(gameObject.loopActive) {
+				if(gameObject.activeState == "main") {
 					console.log('STOPPING THE LOOP');
-					gameObject.stopLoop();
+					//gameObject.stopLoop();
+					gameObject.activeState = "paused";
 				} else {
 					console.log('STARTING THE LOOP');
-					gameObject.startLoop();
+					gameObject.activeState = "main";
 				}
 			}
 			
