@@ -171,6 +171,7 @@ window.onload = function () {
 		playerShip.render  = function (self) {
 			self.renderObject = self.game.canvas.rect(self.pos.x,self.pos.y,self.dim.x,self.dim.y);
 			self.renderObject.attr('stroke',self.colorTypes[self.ammoType]);
+			self.renderObject.attr('stroke-width',"3px");
 			self.renderObject.attr('fill','#F2F2F2');
 		}
 
