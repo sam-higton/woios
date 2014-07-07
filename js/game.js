@@ -76,8 +76,8 @@ window.onload = function () {
 		newAsteroid.types = ["A","B"];
 		newAsteroid.type = "A";
 		newAsteroid.colorTypes = {
-			"A": "#fee",
-			"B": "#eef"
+			"A": "#f55",
+			"B": "#55f"
 		}
 
 		//destroy if asteroid leaves game limits
@@ -150,8 +150,8 @@ window.onload = function () {
 		};
 
 		playerShip.dim = {
-			x: 15,
-			y: 7
+			x: 30,
+			y: 14
 		};
 
 		playerShip.vel = {
