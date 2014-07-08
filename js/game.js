@@ -1,49 +1,74 @@
+function AsteroidGenerator () {
 
+	this.addRandomAsteroid = function (game) {
+		if(game.register['asteroidCount'] > game.register['maxAsteroids']) 	{
+			return;
+		}
+		var newRad = game.helpers['RandomNumber'].getInt(10,40);
+		var newPosX = 640;
+		var newPosY = game.helpers['RandomNumber'].getInt(1,480);
+		var newVelX = game.helpers['RandomNumber'].getFloat(-6,-1);
+		if(newPosY < 30) {
+			newVelY = game.helpers['RandomNumber'].getFloat(0,1);
+		} else if (newPosY > 450) {
+			newVelY = game.helpers['RandomNumber'].getFloat(-1,0);
+		} else {
+			newVelY = game.helpers['RandomNumber'].getFloat(-1,1);
+		}
 
+		if(game.helpers['RandomNumber'].getInt(0,1)) {
+			var type = "A";
+		} else {
+			var type = "B";
+		}
 
+		var nextAsteroid = game.objectFactory.get('asteroid', {
+			startPosX: newPosX,
+			startPosY: newPosY,
+			velocityX: newVelX,
+			velocityY: newVelY,
+			radius: newRad
+		});
+
+		nextAsteroid.type = type;
+
+		game.addGameObject(nextAsteroid);
+		game.register['asteroidCollection'].objectList.push(nextAsteroid);
+		game.register['asteroidCount']++;
+	};
+
+}
 
 window.onload = function () {
 	var game = new ADGame('game-target');
 
-	
 
-	
 
 	game.addSound("shoot","assets/sounds/shoot2.wav");
 	game.addSound("hit","assets/sounds/hit2.wav");
 	game.addSound('killed',"assets/sounds/player_killed.wav");
 
 	game.initActions.push(function (game) {
-		var as1 = game.objectFactory.get('asteroid',{
-			startPosX: 640,
-			startPosY: 20,
-			velocityX: -2,
-			velocityY: 5,
-			radius: 10
-		});
-		var as2 = game.objectFactory.get('asteroid', {
-			startPosX: 640,
-			startPosY: 200,
-			velocityX: -3,
-			velocityY: -2,
-			radius: 20
-		});
+
+		game.register['asteroidCount'] = 0;
+		game.register['maxAsteroids'] = 40;
+		game.register['totalScore'] = 0;
+		game.register['asteroidCollection'] = new GameObjectCollection();
+		game.helpers['RandomNumber'] = new RandomNumber();
+		game.helpers['2DMath'] = new TwoDimensionalMath();
+		game.helpers['AsteroidGenerator'] = new AsteroidGenerator();
+
+		for(var i = 0; i < game.helpers['RandomNumber'].getInt(3,5); i++) {
+			game.helpers['AsteroidGenerator'].addRandomAsteroid(game);
+		}
+
 		var playerShip = game.objectFactory.get('playerShip',{
 			startPosX: 20,
 			startPosY: 240,
 			maxVel: 5
 		});
-		game.addGameObject(as1);
-		game.addGameObject(as2);
 
-		game.register['asteroidCount'] = 2;
-		game.register['maxAsteroids'] = 40;
-		game.register['totalScore'] = 0;
-		game.register['asteroidCollection'] = new GameObjectCollection();
-		game.register['asteroidCollection'].objectList.push(as1);
-		game.register['asteroidCollection'].objectList.push(as2);
-		game.helpers['RandomNumber'] = new RandomNumber();
-		game.helpers['2DMath'] = new TwoDimensionalMath();
+
 		game.addGameObject(playerShip);
 	});
 
@@ -73,40 +98,7 @@ window.onload = function () {
 				console.log('out of bounds: ' + self.id);
 				//spawn between 1 and 3 new asteroids
 				for(var i = 0; i < self.game.helpers['RandomNumber'].getInt(1,2); i++) {
-					if(self.game.register['asteroidCount'] > self.game.register['maxAsteroids']) 	{
-						break;
-					}
-					var newRad = self.game.helpers['RandomNumber'].getInt(10,40);
-					var newPosX = 640;
-					var newPosY = self.game.helpers['RandomNumber'].getInt(1,480);
-					var newVelX = self.game.helpers['RandomNumber'].getFloat(-6,-1);
-					if(newPosY < 30) {
-						newVelY = self.game.helpers['RandomNumber'].getFloat(0,1);
-					} else if (newPosY > 450) {
-						newVelY = self.game.helpers['RandomNumber'].getFloat(-1,0);
-					} else {
-						newVelY = self.game.helpers['RandomNumber'].getFloat(-1,1);
-					}
-
-					if(self.game.helpers['RandomNumber'].getInt(0,1)) {
-						var type = "A";
-					} else {
-						var type = "B";
-					}
-
-					var nextAsteroid = self.game.objectFactory.get('asteroid', {
-						startPosX: newPosX,
-						startPosY: newPosY,
-						velocityX: newVelX,
-						velocityY: newVelY,
-						radius: newRad
-					});
-
-					nextAsteroid.type = type;
-
-					self.game.addGameObject(nextAsteroid);
-					self.game.register['asteroidCollection'].objectList.push(nextAsteroid);
-					self.game.register['asteroidCount']++;
+					self.game.helpers['AsteroidGenerator'].addRandomAsteroid(self.game);
 
 				}
 				//kell me now
@@ -398,7 +390,7 @@ window.onload = function () {
 	game.addState('gameOver');
 	game.addStateAction('gameOver', function (self) {
 		var gameOverMessage = "GAME OVER\n FINAL SCORE: " + self.register['totalScore'];
-		gameOverMessage += "\n PRESS 'K' TO TRY AGAIN";
+		gameOverMessage += "\n PRESS 'S' TO TRY AGAIN";
 		var gameOverText = self.canvas.text(320,240,gameOverMessage);
 		gameOverText.toFront();
 		gameOverText.attr('font-size', '42px');
@@ -406,6 +398,11 @@ window.onload = function () {
 		gameOverText.attr('fill', '#fff');
 		gameOverText.attr('stroke','#000');
 		gameOverText.attr('stroke-width','2px');
+
+		if(self.keyboard['S']) {
+			self.reset();
+		}
+
 	});
 
 	game.addState('start');
@@ -475,6 +472,22 @@ window.onload = function () {
 		textObject.attr('font-size', "18px");
 		textObject.attr('text-align','right');
 
+	});
+
+	game.resetActions.push(function (game) {
+		game.activeState = "start";
+		game.register['asteroidCollection'].objectList = [];
+		game.register['totalScore'] = 0 * 1;
+		for(var i = 0; i < game.helpers['RandomNumber'].getInt(3,5); i++) {
+			game.helpers['AsteroidGenerator'].addRandomAsteroid(game);
+		}
+
+		var playerShip = game.objectFactory.get('playerShip',{
+			startPosX: 20,
+			startPosY: 240,
+			maxVel: 5
+		});
+		game.addGameObject(playerShip);
 	});
 
 	game.startLoop();

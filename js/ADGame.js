@@ -269,6 +269,7 @@ function ADGame (targetElementID) {
 	this.preRenderActions = [];
 	this.activeState = "";
 	this.stateActions = [];
+	this.resetActions = [];
 	this.gameObjects = [];
 	this.objectFactory = new gameObjectFactory(this);
 	this.activeKeys = [];
@@ -416,5 +417,16 @@ function ADGame (targetElementID) {
 
 	this.addGameObject = function (gameObject) {
 		self.gameObjects.push(gameObject);
+	}
+
+	this.reset = function () {
+		self.gameObjects = [];
+		self.currentFrame = 0;
+		self.activeState = "main";
+		for(var i in self.resetActions) {
+			if(typeof self.resetActions[i] == "function") {
+				self.resetActions[i](self);
+			}
+		}
 	}
 }
