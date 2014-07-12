@@ -370,6 +370,9 @@ window.onload = function () {
 				if(secondaryObject.rad < 7) {
 					self.game.register['asteroidCollection'].removeSecondaryObjectById(secondaryObject.id);
 					secondaryObject.destroy();
+					for(var i = 0; i < self.game.helpers['RandomNumber'].getInt(1,3); i++) {
+						self.game.helpers['AsteroidGenerator'].addRandomAsteroid(self.game);
+					}
 				}
 			}
 		});
@@ -386,6 +389,43 @@ window.onload = function () {
 	});
 
 	game.init();
+
+	var userInteractions = {
+		interactions: [
+			{
+				'shipUp' : {
+					type: 'hold',
+					keyBinds: ['W'],
+					joyBinds: ['leftStickUp','dPadUp']
+				},
+				'shipDown' : {
+					type: 'hold',
+					keyBinds: ['S'],
+					joyBinds: ['leftStickDown','dPadDown'],
+				},
+				'shipLeft' : {
+					type: 'hold',
+					keyBinds: ['A'],
+					joyBinds: ['leftStickLeft', 'dPadLeft']
+				},
+				'shipRight' : {
+					type: 'hold',
+					keyBinds: ['D'],
+					joyBinds: ['leftStickRight', 'dPadRight']
+				},
+				'shipFire' : {
+					type: 'hold',
+					keyBinds: ['K'],
+					joyBinds: ['buttonA']
+				},
+				'shipToggleType' : {
+					type: 'toggle',
+					keyBinds:  ['L'],
+					joyBinds: ['buttonB']
+				}
+			}
+		]
+	}
 	
 	game.addState('gameOver');
 	game.addStateAction('gameOver', function (self) {
